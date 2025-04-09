@@ -10,10 +10,10 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useGetCourseDetailWithStatusQuery } from "@/features/api/purchaseApi";
-import { BadgeInfo, Lock, PlayCircle } from "lucide-react";
-import React from "react";
+import { BadgeInfo, Clock, Globe, Lock, PlayCircle, Users } from "lucide-react";
 import ReactPlayer from "react-player";
 import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 
 const CourseDetail = () => {
   const params = useParams();
@@ -22,86 +22,204 @@ const CourseDetail = () => {
   const { data, isLoading, isError } =
     useGetCourseDetailWithStatusQuery(courseId);
 
-  if (isLoading) return <h1>Loading...</h1>;
-  if (isError) return <h>Failed to load course details</h>;
+  const [selectedLecture, setSelectedLecture] = useState(null);
+
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-pulse text-2xl font-semibold">Loading...</div>
+    </div>
+  );
+  
+  if (isError) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-2xl text-red-500">Failed to load course details</div>
+    </div>
+  );
 
   const { course, purchased } = data;
-  console.log(purchased);
 
   const handleContinueCourse = () => {
-    if(purchased){
-      navigate(`/course-progress/${courseId}`)
+    if (purchased) {
+      navigate(`/course-progress/${courseId}`);
     }
-  }
+  };
+
+  const getFirstVideoLecture = () => {
+    if (!course.lectures || course.lectures.length === 0) {
+      return null;
+    }
+
+    return (
+      course.lectures.find((lecture) => {
+        return (
+          lecture.videoUrl ||
+          (lecture.videoInfo && lecture.videoInfo.videoUrl)
+        );
+      }) || course.lectures[0]
+    );
+  };
+
+  const firstVideoLecture = getFirstVideoLecture();
+
+  const getVideoUrl = (lecture) => {
+    if (!lecture) return null;
+    return lecture.videoUrl || (lecture.videoInfo && lecture.videoInfo.videoUrl);
+  };
+
+  const videoUrl = getVideoUrl(selectedLecture || firstVideoLecture);
 
   return (
-    <div className="space-y-5">
-      <div className="bg-[#2D2F31] text-white">
-        <div className="max-w-7xl mx-auto py-8 px-4 md:px-8 flex flex-col gap-2">
-          <h1 className="font-bold text-2xl md:text-3xl">
-            {course?.courseTitle}
-          </h1>
-          <p className="text-base md:text-lg">Course Sub-title</p>
-          <p>
-            Created By{" "}
-            <span className="text-[#C0C4FC] underline italic">
-              {course?.creator.name}
-            </span>
-          </p>
-          <div className="flex items-center gap-2 text-sm">
-            <BadgeInfo size={16} />
-            <p>Last updated {course?.createdAt.split("T")[0]}</p>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+      <div className="bg-[#1A1B1E] text-white">
+        <div className="max-w-7xl mx-auto py-12 px-4 md:px-8">
+          <div className="max-w-3xl">
+            <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              {course?.courseTitle}
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 mb-6">
+              {course?.subTitle || "Course Sub-title"}
+            </p>
+            <div className="flex flex-wrap gap-6 text-sm text-gray-300 mb-8">
+              <div className="flex items-center gap-2">
+                <Globe size={18} />
+                <p>Created By{" "}
+                  <span className="text-[#8B5CF6] hover:text-[#A78BFA] transition-colors cursor-pointer">
+                    {course?.creator.name}
+                  </span>
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock size={18} />
+                <p>Last updated {new Date(course?.createdAt).toLocaleDateString()}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users size={18} />
+                <p>{course?.enrolledStudents.length} students enrolled</p>
+              </div>
+            </div>
           </div>
-          <p>Students enrolled: {course?.enrolledStudents.length}</p>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto my-5 px-4 md:px-8 flex flex-col lg:flex-row justify-between gap-10">
-        <div className="w-full lg:w-1/2 space-y-5">
-          <h1 className="font-bold text-xl md:text-2xl">Description</h1>
-          <p
-            className="text-sm"
-            dangerouslySetInnerHTML={{ __html: course.description }}
-          />
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Content</CardTitle>
-              <CardDescription>4 lectures</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {course.lectures.map((lecture, idx) => (
-                <div key={idx} className="flex items-center gap-3 text-sm">
-                  <span>
-                    {true ? <PlayCircle size={14} /> : <Lock size={14} />}
-                  </span>
-                  <p>{lecture.lectureTitle}</p>
+
+      <div className="max-w-7xl mx-auto py-12 px-4 md:px-8">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Left Section */}
+          <div className="flex-1 space-y-8">
+            <div className="bg-card rounded-xl p-8 shadow-lg">
+              <h2 className="text-2xl font-bold mb-6">Course Overview</h2>
+              <div className="prose prose-gray dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: course.description }}
+              />
+            </div>
+
+            <Card className="shadow-lg border-0 bg-card/50 backdrop-blur">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl">Course Content</CardTitle>
+                <CardDescription className="flex items-center gap-2">
+                  <PlayCircle size={16} />
+                  {course.lectures.length} lectures
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {course.lectures.map((lecture, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => {
+                        if (purchased || lecture.isPreviewFree) {
+                          setSelectedLecture(lecture);
+                        }
+                      }}
+                      className={`
+                        flex items-center gap-4 p-4 rounded-lg transition-all
+                        ${(selectedLecture?.lectureTitle === lecture.lectureTitle ||
+                          (!selectedLecture && firstVideoLecture?.lectureTitle === lecture.lectureTitle))
+                          ? "bg-primary/10 shadow-md"
+                          : "hover:bg-primary/5"}
+                        ${purchased || lecture.isPreviewFree ? "cursor-pointer" : "opacity-75"}
+                      `}
+                    >
+                      <div className={`
+                        p-2 rounded-full
+                        ${purchased || lecture.isPreviewFree
+                          ? "bg-primary/20 text-primary"
+                          : "bg-muted text-muted-foreground"}
+                      `}>
+                        {purchased || lecture.isPreviewFree ? (
+                          <PlayCircle size={20} />
+                        ) : (
+                          <Lock size={20} />
+                        )}
+                      </div>
+                      <div>
+                        <p className={`font-medium ${
+                          (selectedLecture?.lectureTitle === lecture.lectureTitle ||
+                            (!selectedLecture && firstVideoLecture?.lectureTitle === lecture.lectureTitle))
+                            ? "text-primary"
+                            : ""
+                        }`}>
+                          {lecture.lectureTitle}
+                        </p>
+                        {!purchased && !lecture.isPreviewFree && (
+                          <p className="text-sm text-muted-foreground">Premium Content</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-        <div className="w-full lg:w-1/3">
-          <Card>
-            <CardContent className="p-4 flex flex-col">
-              <div className="w-full aspect-video mb-4">
-                <ReactPlayer
-                  width="100%"
-                  height={"100%"}
-                  url={course.lectures[0].videoUrl}
-                  controls={true}
-                />
-              </div>
-              <h1>Lecture title</h1>
-              <Separator className="my-2" />
-              <h1 className="text-lg md:text-xl font-semibold">Course Price</h1>
-            </CardContent>
-            <CardFooter className="flex justify-center p-4">
-              {purchased ? (
-                <Button onClick={handleContinueCourse} className="w-full">Continue Course</Button>
-              ) : (
-                <BuyCourseButton courseId={courseId} />
-              )}
-            </CardFooter>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Section */}
+          <div className="lg:w-[400px] flex flex-col gap-6">
+            <Card className="shadow-lg border-0 bg-card/50 backdrop-blur sticky top-6">
+              <CardContent className="p-6">
+                <div className="w-full aspect-video rounded-lg overflow-hidden mb-6 shadow-xl">
+                  {videoUrl ? (
+                    <ReactPlayer
+                      width="100%"
+                      height="100%"
+                      url={videoUrl}
+                      controls={true}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-muted text-muted-foreground">
+                      No video available
+                    </div>
+                  )}
+                </div>
+                <h3 className="font-medium text-lg mb-2">
+                  {selectedLecture?.lectureTitle ||
+                    firstVideoLecture?.lectureTitle ||
+                    "Lecture title"}
+                </h3>
+                <Separator className="my-6" />
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold">
+                    {course.coursePrice ? (
+                      <span className="flex items-baseline gap-2">
+                        ${course.coursePrice.toFixed(2)}
+                        <span className="text-sm text-muted-foreground">USD</span>
+                      </span>
+                    ) : (
+                      "Free"
+                    )}
+                  </h3>
+                  {purchased ? (
+                    <Button
+                      onClick={handleContinueCourse}
+                      className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                    >
+                      Continue Learning
+                    </Button>
+                  ) : (
+                    <BuyCourseButton courseId={courseId} />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

@@ -33,44 +33,43 @@ const AddCourse = () => {
     await createCourse({ courseTitle, category });
   };
 
-  // for displaying toast
-  useEffect(()=>{
-    if(isSuccess){
-        toast.success(data?.message || "Course created.");
-        navigate("/admin/course");
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data?.message || "Course created.");
+      navigate("/admin/course");
     }
-  },[isSuccess, error])
+  }, [isSuccess, error]);
 
   return (
-    <div className="flex-1 mx-10">
-      <div className="mb-4">
-        <h1 className="font-bold text-xl">
-          Lets add course, add some basic course details for your new course
+    <div className="flex-1 mx-8 p-6 bg-gray-50 rounded-xl shadow-sm">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Add a New Course
         </h1>
-        <p className="text-sm">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus,
-          laborum!
+        <p className="text-sm text-gray-500 mt-1">
+          Provide the basic details to start creating your new course.
         </p>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-6 max-w-md">
         <div>
-          <Label>Title</Label>
+          <Label className="text-gray-700 font-medium">Course Title</Label>
           <Input
             type="text"
             value={courseTitle}
             onChange={(e) => setCourseTitle(e.target.value)}
             placeholder="Your Course Name"
+            className="mt-1 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 bg-white rounded-lg"
           />
         </div>
         <div>
-          <Label>Category</Label>
+          <Label className="text-gray-700 font-medium">Category</Label>
           <Select onValueChange={getSelectedCategory}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full mt-1 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 bg-white rounded-lg">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border-gray-200 rounded-lg">
               <SelectGroup>
-                <SelectLabel>Category</SelectLabel>
+                <SelectLabel className="text-gray-600">Category</SelectLabel>
                 <SelectItem value="Next JS">Next JS</SelectItem>
                 <SelectItem value="Data Science">Data Science</SelectItem>
                 <SelectItem value="Frontend Development">
@@ -91,11 +90,19 @@ const AddCourse = () => {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => navigate("/admin/course")}>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/admin/course")}
+            className="border-gray-200 text-gray-700 hover:bg-gray-100 hover:text-gray-800 rounded-lg font-medium"
+          >
             Back
           </Button>
-          <Button disabled={isLoading} onClick={createCourseHandler}>
+          <Button
+            disabled={isLoading}
+            onClick={createCourseHandler}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

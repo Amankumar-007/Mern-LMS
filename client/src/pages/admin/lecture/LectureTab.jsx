@@ -14,20 +14,21 @@ import { useEditLectureMutation, useGetLectureByIdQuery, useRemoveLectureMutatio
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const MEDIA_API = "http://localhost:8080/api/v1/media";
 
 const LectureTab = () => {
   const [lectureTitle, setLectureTitle] = useState("");
-  const [uploadVideInfo, setUploadVideoInfo] = useState(null);
+  const [uploadVideoInfo, setUploadVideoInfo] = useState(null);
   const [isFree, setIsFree] = useState(false);
   const [mediaProgress, setMediaProgress] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [btnDisable, setBtnDisable] = useState(true);
   const params = useParams();
   const { courseId, lectureId } = params;
+  const navigate = useNavigate();
 
   const {data:lectureData} = useGetLectureByIdQuery(lectureId);
   const lecture = lectureData?.lecture;
@@ -36,13 +37,22 @@ const LectureTab = () => {
     if(lecture){
       setLectureTitle(lecture.lectureTitle);
       setIsFree(lecture.isPreviewFree);
-      setUploadVideoInfo(lecture.videoInfo)
+      
+      // Check if video info exists either as videoInfo or as separate properties
+      if (lecture.videoInfo) {
+        setUploadVideoInfo(lecture.videoInfo);
+      } else if (lecture.videoUrl) {
+        setUploadVideoInfo({
+          videoUrl: lecture.videoUrl,
+          publicId: lecture.publicId || ""
+        });
+      }
     }
-  },[lecture])
+  },[lecture]);
 
-  const [edtiLecture, { data, isLoading, error, isSuccess }] =
+  const [editLecture, { data, isLoading, error, isSuccess }] =
     useEditLectureMutation();
-    const [removeLecture,{data:removeData, isLoading:removeLoading, isSuccess:removeSuccess}] = useRemoveLectureMutation();
+  const [removeLecture,{data:removeData, isLoading:removeLoading, isSuccess:removeSuccess}] = useRemoveLectureMutation();
 
   const fileChangeHandler = async (e) => {
     const file = e.target.files[0];
@@ -58,7 +68,6 @@ const LectureTab = () => {
         });
 
         if (res.data.success) {
-          console.log(res);
           setUploadVideoInfo({
             videoUrl: res.data.data.url,
             publicId: res.data.data.public_id,
@@ -68,7 +77,7 @@ const LectureTab = () => {
         }
       } catch (error) {
         console.log(error);
-        toast.error("video upload failed");
+        toast.error("Video upload failed");
       } finally {
         setMediaProgress(false);
       }
@@ -76,12 +85,10 @@ const LectureTab = () => {
   };
 
   const editLectureHandler = async () => {
-    console.log({ lectureTitle, uploadVideInfo, isFree, courseId, lectureId });
-
-    await edtiLecture({
+    await editLecture({
       lectureTitle,
-      videoInfo:uploadVideInfo,
-      isPreviewFree:isFree,
+      videoInfo: uploadVideoInfo,
+      isPreviewFree: isFree,
       courseId,
       lectureId,
     });
@@ -89,7 +96,10 @@ const LectureTab = () => {
 
   const removeLectureHandler = async () => {
     await removeLecture(lectureId);
-  }
+    if (!removeLoading) {
+      navigate(`/admin/course/${courseId}/lecture`);
+    }
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -103,8 +113,9 @@ const LectureTab = () => {
   useEffect(()=>{
     if(removeSuccess){
       toast.success(removeData.message);
+      navigate(`/admin/course/${courseId}/lecture`);
     }
-  },[removeSuccess])
+  },[removeSuccess, removeData, navigate, courseId]);
 
   return (
     <Card>
@@ -116,7 +127,7 @@ const LectureTab = () => {
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
-          <Button disbaled={removeLoading} variant="destructive" onClick={removeLectureHandler}>
+          <Button disabled={removeLoading} variant="destructive" onClick={removeLectureHandler}>
             {
               removeLoading ? <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
@@ -147,6 +158,12 @@ const LectureTab = () => {
             placeholder="Ex. Introduction to Javascript"
             className="w-fit"
           />
+          {uploadVideoInfo && uploadVideoInfo.videoUrl && (
+            <div className="mt-2">
+              <p className="text-sm text-green-600">Video uploaded successfully</p>
+              <p className="text-xs text-gray-500 truncate">{uploadVideoInfo.videoUrl}</p>
+            </div>
+          )}
         </div>
         <div className="flex items-center space-x-2 my-5">
           <Switch checked={isFree} onCheckedChange={setIsFree} id="airplane-mode" />
@@ -168,7 +185,6 @@ const LectureTab = () => {
                 Please wait
                 </> : "Update Lecture"
               }
-            
           </Button>
         </div>
       </CardContent>
