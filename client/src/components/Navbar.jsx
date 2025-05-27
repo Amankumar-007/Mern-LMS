@@ -60,7 +60,7 @@ const Navbar = () => {
         {/* Center - Nav Links */}
         <nav className="hidden md:flex gap-6 text-sm font-medium items-center">
           <Link to="/about" className="hover:text-indigo-600 transition">About</Link>
-          <Link to="/courses"  className="hover:text-indigo-600 transition">Courses</Link>
+          <Link to="/courses" className="hover:text-indigo-600 transition">Courses</Link>
           <Link to="/instructor" className="hover:text-indigo-600 transition">Teach on Edu</Link>
         </nav>
 
@@ -93,7 +93,15 @@ const Navbar = () => {
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                      <Link to="/admin/dashboard">Dashboard</Link>
+                      <Link to="/instructor/dashboard">Instructor Dashboard</Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {user?.role === "admin" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <Link to="/admin/dashboard">Admin Dashboard</Link>
                     </DropdownMenuItem>
                   </>
                 )}
@@ -129,14 +137,14 @@ const Navbar = () => {
                 <SheetTitle>
                   <Link to="/" className="flex items-center gap-2">
                     <School className="text-indigo-600" />
-                    <span className="font-semibold">Edu Platform</span>
+                    <span className="font-semibold">EduLearn</span>
                   </Link>
                 </SheetTitle>
               </SheetHeader>
               <div className="mt-6 flex flex-col gap-4 text-sm">
                 <Link to="/about">About</Link>
                 <Link to="/courses">Courses</Link>
-                <Link to="/teach">Teach on Edu</Link>
+                <Link to="/instructor">Teach on Edu</Link>
 
                 {user ? (
                   <>
@@ -146,7 +154,10 @@ const Navbar = () => {
                       Logout
                     </p>
                     {user?.role === "instructor" && (
-                      <Link to="/admin/dashboard">Dashboard</Link>
+                      <Link to="/instructor/dashboard">Instructor Dashboard</Link>
+                    )}
+                    {user?.role === "admin" && (
+                      <Link to="/admin/dashboard">Admin Dashboard</Link>
                     )}
                   </>
                 ) : (

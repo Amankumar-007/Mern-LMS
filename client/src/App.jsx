@@ -18,41 +18,35 @@ import {
   AdminRoute,
   AuthenticatedUser,
   ProtectedRoute,
+  InstructorRoute,
 } from "./components/ProtectedRoutes";
 import PurchaseCourseProtectedRoute from "./components/PurchaseCourseProtectedRoute";
 import { ThemeProvider } from "./components/ThemeProvider";
 import Home from "./pages/Home";
 import Courses from "./pages/student/Courses";
-import InstructorPage from "./pages/instructor/InstructorPage";
-import RegisterPage from "./pages/instructor/RegisterPage";
 import About from "./pages/About";
 
+// Instructor pages
+import InstructorPage from "./pages/instructor/InstructorPage";
+import RegisterPage from "./pages/instructor/RegisterPage";
 
 const appRouter = createBrowserRouter(
   [
     {
       path: "courses",
-      element: (
-          <Courses />
-      ),
+      element: <Courses />,
     },
     {
       path: "about",
-      element: (
-          <About />
-      ),
+      element: <About />,
     },
     {
       path: "register",
-      element: (
-          <RegisterPage />
-      ),
+      element: <RegisterPage />,
     },
     {
       path: "instructor",
-      element: (
-          <InstructorPage />
-      ),
+      element: <InstructorPage />,
     },
     {
       path: "/",
@@ -60,11 +54,7 @@ const appRouter = createBrowserRouter(
       children: [
         {
           path: "/",
-          element: (
-            <>
-              <Home/>
-            </>
-          ),
+          element: <Home />,
         },
         {
           path: "login",
@@ -117,7 +107,43 @@ const appRouter = createBrowserRouter(
           ),
         },
 
-        // admin routes start from here
+        // instructor routes
+        {
+          path: "instructor/dashboard",
+          element: (
+            <InstructorRoute>
+              <Sidebar />
+            </InstructorRoute>
+          ),
+          children: [
+            {
+              path: "",
+              element: <Dashboard />,
+            },
+            {
+              path: "course",
+              element: <CourseTable />,
+            },
+            {
+              path: "course/create",
+              element: <AddCourse />,
+            },
+            {
+              path: "course/:courseId",
+              element: <EditCourse />,
+            },
+            {
+              path: "course/:courseId/lecture",
+              element: <CreateLecture />,
+            },
+            {
+              path: "course/:courseId/lecture/:lectureId",
+              element: <EditLecture />,
+            },
+          ],
+        },
+
+        // admin routes
         {
           path: "admin",
           element: (
@@ -172,12 +198,11 @@ const appRouter = createBrowserRouter(
   }
 );
 
-
 function App() {
   return (
     <main>
       <ThemeProvider>
-      <RouterProvider router={appRouter} />
+        <RouterProvider router={appRouter} />
       </ThemeProvider>
     </main>
   );

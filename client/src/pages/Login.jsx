@@ -85,14 +85,11 @@ const Login = () => {
         case "admin":
           navigate("/admin/dashboard");
           break;
-        case "trainer":
-          navigate("/trainer/dashboard");
+        case "instructor":
+          navigate("/instructor/dashboard");
           break;
         case "student":
-          navigate("/student/dashboard");
-          break;
-        case "examiner":
-          navigate("/examiner/dashboard");
+          navigate("/my-learning");
           break;
         default:
           navigate("/");
@@ -108,6 +105,9 @@ const Login = () => {
     registerData,
     loginError,
     registerError,
+    loginIsSuccess,
+    registerIsSuccess,
+    navigate,
   ]);
 
   return (

@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 
-export const generateToken = (res, user, message) => {
-  const secret = process.env.SECRET_KEY;
+export const generateToken = (res, user, message) => {  const secret = process.env.JWT_SECRET;
 
   if (!secret) {
-    console.error("❌ SECRET_KEY is not defined in .env file");
+    console.error("❌ JWT_SECRET is not defined in .env file");
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 

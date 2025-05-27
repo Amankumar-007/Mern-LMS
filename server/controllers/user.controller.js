@@ -59,15 +59,25 @@ export const login = async (req,res) => {
                 success:false,
                 message:"Incorrect email or password"
             })
-        }
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        }        const isPasswordMatch = await bcrypt.compare(password, user.password);
         if(!isPasswordMatch){
             return res.status(400).json({
                 success:false,
                 message:"Incorrect email or password"
             });
         }
-        generateToken(res, user, `Welcome back ${user.name}`);
+        
+        // Remove password from user object before sending
+        const userWithoutPassword = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            photoUrl: user.photoUrl,
+            enrolledCourses: user.enrolledCourses
+        };
+        
+        return generateToken(res, userWithoutPassword, `Welcome back ${user.name}`);
 
     } catch (error) {
         console.log(error);

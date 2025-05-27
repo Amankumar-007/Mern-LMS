@@ -12,10 +12,9 @@ const userSchema = new mongoose.Schema({
     password:{
         type:String,
         required:true
-    },
-    role:{
+    },    role:{
         type:String,
-        enum:["instructor", "student"],
+        enum:["admin", "instructor", "student"],
         default:'student'
     },
     enrolledCourses:[
@@ -23,10 +22,13 @@ const userSchema = new mongoose.Schema({
             type:mongoose.Schema.Types.ObjectId,
             ref:'Course'
         }
-    ],
-    photoUrl:{
+    ],    photoUrl:{
         type:String,
         default:""
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false
     }
 },{timestamps:true});
 
