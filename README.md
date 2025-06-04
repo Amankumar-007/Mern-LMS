@@ -66,8 +66,8 @@ MONGO_URI=your_mongo_connection_string
 JWT_SECRET=your_secret_key
 STRIPE_SECRET_KEY=your_stripe_key
 
-git clone https://github.com/yourusername/lms-frontend
-cd lms-frontend
+git clone https://github.com/Amankumar-007/Mern-lms
+cd Mern-lms
 npm install
 npm start
 
@@ -83,7 +83,7 @@ lms/
 ├── middlewares/        # Auth & error handlers
 ├── utils/              # Payment configs, tokens
 
-```
+
 ---
 
 Would you like me to generate this as a `.md` file for download?
