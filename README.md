@@ -59,6 +59,7 @@ git clone https://github.com/yourusername/lms-backend
 cd lms-backend
 npm install
 npm start
+```
 
 PORT=5000
 MONGO_URI=your_mongo_connection_string
