@@ -83,7 +83,7 @@ lms/
 ├── middlewares/        # Auth & error handlers
 ├── utils/              # Payment configs, tokens
 
-
+```
 ---
 
 Would you like me to generate this as a `.md` file for download?
