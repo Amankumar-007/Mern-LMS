@@ -14,6 +14,7 @@ import Footer from "../components/Footer";
 import Header from "../components/Navbar";
 import CourseListing from "./student/Courses";
 import { useState } from "react";
+import CourseShowcase from "@/components/CourseShowcase";
 
 function Home() {
   const [selectedLanguage, setSelectedLanguage] = useState("English");
@@ -188,7 +189,7 @@ function Home() {
       </section>
 
       {/* Course Listing Component */}
-      <CourseListing />
+      <CourseShowcase/>
 
       {/* Reviews Section */}
       <section className="py-24 bg-gradient-to-b from-white to-blue-50">

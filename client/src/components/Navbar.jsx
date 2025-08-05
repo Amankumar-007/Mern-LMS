@@ -121,7 +121,11 @@ const Navbar = () => {
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer ring-2 ring-indigo-200 hover:ring-indigo-400 transition duration-200">
                   <AvatarImage
-                    src={user?.photoUrl || "https://github.com/shadcn.png"}
+                  src={
+  user?.photoUrl ||
+  `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || user?.email || "user")}`
+}
+
                   />
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>

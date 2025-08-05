@@ -78,7 +78,11 @@ const Profile = () => {
         <div className="flex flex-col items-center">
           <Avatar className="h-24 w-24 md:h-32 md:w-32 mb-4">
             <AvatarImage
-              src={user?.photoUrl || "https://github.com/shadcn.png"}
+              src={
+  user?.photoUrl ||
+  `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || user?.email || "user")}`
+}
+
               alt="@shadcn"
             />
             <AvatarFallback>CN</AvatarFallback>
